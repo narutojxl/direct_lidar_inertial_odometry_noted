@@ -1,0 +1,73 @@
+###########################################################
+#                                                         #
+# Copyright (c)                                           #
+#                                                         #
+# The Verifiable & Control-Theoretic Robotics (VECTR) Lab #
+# University of California, Los Angeles                   #
+#                                                         #
+# Authors: Kenny J. Chen, Ryan Nemiroff, Brett T. Lopez   #
+# Contact: {kennyjchen, ryguyn, btlopez}@ucla.edu         #
+#                                                         #
+###########################################################
+
+dlio:
+
+  frames:
+    odom: odom   #laser_odom(map)
+    baselink: base_link
+    lidar: lidar
+    imu: imu
+
+  map:
+    waitUntilMove: true
+    dense:
+      filtered: false
+    sparse:   
+      frequency: 1.0  # not used 
+      leafSize: 0.25  # not used
+
+  odom:
+
+    gravity: 9.80665
+
+    imu:
+      approximateGravity: false  #在标定时候是否进行重力对齐, 估计最开始的姿态角
+      calibration:
+        gyro: true  #在标定阶段是否计算bias_g
+        accel: true #在标定阶段是否计算bias_a
+        time: 3 #s
+      bufferSize: 5000
+
+    preprocessing:
+      cropBoxFilter:
+        size: 1.0  #把正负1m内的points滤除掉
+      voxelFilter:
+        res: 0.25  #0.1m
+
+    keyframe:
+      threshD: 1.0  #m
+      threshR: 45.0 #degree
+
+    submap:
+      keyframe:
+        knn: 10
+        kcv: 10
+        kcc: 10
+    gicp:
+      minNumPoints: 64
+      kCorrespondences: 16
+      maxCorrespondenceDistance: 0.5
+      maxIterations: 32 #64
+      transformationEpsilon: 0.01
+      rotationEpsilon: 0.01
+      initLambdaFactor: 1e-9
+    
+    #Geometric Observer
+    geo:
+      Kp: 4.5    #r3
+      Kv: 11.25  #r4
+      Kq: 4.0    #r1
+      Kab: 2.25  #acc bias r5
+      Kgb: 1.0   #gyro bias r2 
+      abias_max: 5.0   #[-5, 5] m/s^2
+      gbias_max: 0.5   #[-0.5, 0.5] rad
